@@ -1,0 +1,53 @@
+= DBterm API 문서
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+DBterm API에 대한 간단한 개요입니다. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+== 인증
+
+모든 요청은 `Authorization` 헤더를 사용합니다.
+
+[source,http]
+----
+Authorization: Bearer lorem-ipsum-token
+----
+
+== Users API
+
+=== 사용자 목록 조회
+
+*Method*:: `GET`
+*Path*:: `/api/v1/users`
+
+요약:: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+==== 요청 파라미터
+
+[cols="1,1,2",options="header"]
+|===
+|이름 |타입 |설명
+|page |int  |Lorem ipsum page.
+|size |int  |Lorem ipsum size.
+|===
+
+==== 응답 예시
+
+[source,json]
+----
+{
+  "content": [
+    {
+      "id": 1,
+      "username": "lorem",
+      "email": "ipsum@example.com"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1
+}
+----
