@@ -117,16 +117,27 @@
     .endpoint {
       background-color: #ffffff;
       border-radius: 10px;
-      padding: 14px 16px 12px;
       margin-top: 12px;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
       border: 1px solid #e5e7eb;
+      overflow: hidden;
     }
     .endpoint-header {
+      width: 100%;
+      padding: 10px 16px;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 16px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+    }
+    .endpoint-header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .endpoint-title {
@@ -140,6 +151,28 @@
       padding: 4px 6px;
       border-radius: 6px;
       margin-left: 4px;
+    }
+    .endpoint-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .endpoint-arrow {
+      font-size: 12px;
+      opacity: 0.7;
+      transition: transform 0.15s ease-out;
+    }
+    .endpoint.open .endpoint-arrow {
+      transform: rotate(90deg);
+    }
+    .endpoint-body {
+      display: none;
+      padding: 0 16px 12px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .endpoint.open .endpoint-body {
+      display: block;
     }
     .endpoint-desc {
       font-size: 13px;
@@ -175,6 +208,8 @@
       border-radius: 8px;
       overflow-x: auto;
       font-size: 12px;
+      line-height: 1.5;
+      margin-top: 8px;
     }
     .tag {
       display: inline-block;
@@ -184,6 +219,12 @@
       font-size: 11px;
       margin-right: 4px;
       margin-bottom: 4px;
+    }
+    .yaml-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 2px;
     }
     @media (max-width: 960px) {
       .container {
@@ -250,9 +291,7 @@
         모든 보호된 API는 인증 토큰 기반으로 호출합니다.
         로그인 성공 시 발급되는 액세스 토큰을 이후 요청의 <code>Authorization</code> 헤더에 포함해야 합니다.
       </p>
-      <pre>{
-  "Authorization": "Bearer &lt;access-token&gt;"
-}</pre>
+      <pre>Authorization: Bearer &lt;access-token&gt;</pre>
     </section>
 
     <section id="roles">
@@ -283,7 +322,7 @@
           </tr>
           <tr>
             <td>Operator</td>
-            <td>캠페인 생성·수정, 기부 건 검증, 배분안 검토 및 승인</td>
+            <td>캠페인 생성·수정, 기부 검증, 배분안 검토 및 승인</td>
           </tr>
           <tr>
             <td>Accountant</td>
@@ -301,97 +340,98 @@
       <h2>4. Auth API</h2>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-post">POST</span>
             <span class="endpoint-title">로그인</span>
             <span class="endpoint-path">/auth/login</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Public</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            아이디와 비밀번호를 이용해 로그인하고 액세스 토큰을 발급받습니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>body:
+  username: "donor01"
+  password: "passw0rd!"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  user:
+    userId: 1
+    username: "donor01"
+    role: "DONOR"</pre>
         </div>
-        <p class="endpoint-desc">
-          아이디와 비밀번호를 이용해 로그인하고 액세스 토큰을 발급받습니다.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Request Body</th>
-              <th>타입</th>
-              <th>필수</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>username</td>
-              <td>string</td>
-              <td>Y</td>
-              <td>사용자 로그인 ID</td>
-            </tr>
-            <tr>
-              <td>password</td>
-              <td>string</td>
-              <td>Y</td>
-              <td>비밀번호(평문 또는 별도 암호화 규약에 따름)</td>
-            </tr>
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            <tr>
-              <th>Response</th>
-              <th>타입</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>accessToken</td>
-              <td>string</td>
-              <td>API 호출에 사용하는 JWT 또는 토큰 값</td>
-            </tr>
-            <tr>
-              <td>user</td>
-              <td>object</td>
-              <td><code>userId, username, role</code> 등 기본 정보</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">내 정보 조회</span>
             <span class="endpoint-path">/auth/me</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Authenticated</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            현재 로그인한 사용자의 기본 정보를 반환합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  userId: 1
+  username: "donor01"
+  displayName: "홍길동"
+  role: "DONOR"
+  anonymous: false</pre>
         </div>
-        <p class="endpoint-desc">
-          현재 로그인한 사용자의 기본 정보를 반환합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-put">PUT</span>
             <span class="endpoint-title">내 프로필 수정</span>
             <span class="endpoint-path">/auth/me/profile</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Authenticated</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            표시 이름, 익명 여부 등 일부 프로필 정보를 수정합니다.
+            모든 변경 내역은 감사 로그에 기록됩니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+body:
+  displayName: "익명 후원자"
+  anonymous: true</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  userId: 1
+  username: "donor01"
+  displayName: "익명 후원자"
+  role: "DONOR"
+  anonymous: true</pre>
         </div>
-        <p class="endpoint-desc">
-          표시 이름, 익명 여부 등 일부 프로필 정보를 수정합니다.
-          모든 변경 내역은 감사 로그에 기록됩니다.
-        </p>
       </div>
     </section>
 
@@ -399,119 +439,137 @@
       <h2>5. Donor API</h2>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">캠페인 목록 조회</span>
             <span class="endpoint-path">/campaigns</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Donor</span>
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            활성화된 후원 캠페인 목록을 조회합니다. Donor는 읽기 전용입니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  status: "ACTIVE"
+  from: "2025-01-01"
+  to: "2025-12-31"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - campaignId: 101
+      title: "소아암 환아 치료비 지원"
+      description: "소아암 환아를 위한 치료비를 지원합니다."
+      status: "ACTIVE"
+      startDate: "2025-01-01"
+      endDate: "2025-12-31"
+      createdBy: 10
+    - campaignId: 102
+      title: "저소득층 장학금"
+      description: "저소득층 아동을 위한 장학금 캠페인입니다."
+      status: "ACTIVE"
+      startDate: "2025-03-01"
+      endDate: "2025-09-30"</pre>
         </div>
-        <p class="endpoint-desc">
-          활성화된 후원 캠페인 목록을 조회합니다. Donor는 읽기 전용입니다.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Query</th>
-              <th>타입</th>
-              <th>필수</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>status</td>
-              <td>string</td>
-              <td>N</td>
-              <td>ACTIVE, INACTIVE 필터</td>
-            </tr>
-            <tr>
-              <td>from</td>
-              <td>date</td>
-              <td>N</td>
-              <td>시작일 기준 필터(예: 2025-01-01)</td>
-            </tr>
-            <tr>
-              <td>to</td>
-              <td>date</td>
-              <td>N</td>
-              <td>종료일 기준 필터</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">내 후원 내역 조회</span>
             <span class="endpoint-path">/donor/donations</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Donor</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            로그인한 후원자의 기부 내역을 기간 및 캠페인별로 조회합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  from: "2025-01-01"
+  to: "2025-12-31"
+  campaignId: 101
+  sort: "DATE_DESC"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - donationId: 5001
+      campaignId: 101
+      amount: 30000
+      donatedAt: "2025-05-10T12:30:00Z"
+      verified: true
+    - donationId: 5002
+      campaignId: 101
+      amount: 20000
+      donatedAt: "2025-08-01T09:15:00Z"
+      verified: true</pre>
         </div>
-        <p class="endpoint-desc">
-          로그인한 후원자의 기부 내역을 기간 및 캠페인별로 조회합니다.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Query</th>
-              <th>타입</th>
-              <th>필수</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>from</td>
-              <td>date</td>
-              <td>N</td>
-              <td>조회 시작일</td>
-            </tr>
-            <tr>
-              <td>to</td>
-              <td>date</td>
-              <td>N</td>
-              <td>조회 종료일</td>
-            </tr>
-            <tr>
-              <td>campaignId</td>
-              <td>number</td>
-              <td>N</td>
-              <td>특정 캠페인만 필터링</td>
-            </tr>
-            <tr>
-              <td>sort</td>
-              <td>string</td>
-              <td>N</td>
-              <td>DATE_ASC, DATE_DESC, AMOUNT_DESC 등</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">후원금 사용처 추적</span>
             <span class="endpoint-path">/donor/donations/{donationId}/trace</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Donor</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            선택한 후원 건이 어떤 수혜자에게 얼마씩 배분되고, 실제로 언제 지급되었는지
+            배분과 지급 정보를 함께 조회합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+path:
+  donationId: 5001</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  donation:
+    donationId: 5001
+    campaignId: 101
+    amount: 30000
+    donatedAt: "2025-05-10T12:30:00Z"
+  allocations:
+    - allocationId: 9001
+      receiverId: 201
+      receiverName: "김아름"
+      amount: 20000
+      status: "EXECUTED"
+      disbursements:
+        - disbursementId: 7001
+          amount: 20000
+          executedAt: "2025-05-20T09:00:00Z"
+    - allocationId: 9002
+      receiverId: 202
+      receiverName: "이민수"
+      amount: 10000
+      status: "APPROVED"
+      disbursements: []</pre>
         </div>
-        <p class="endpoint-desc">
-          선택한 후원 건이 어떤 수혜자에게 얼마씩 배분되고, 실제로 언제 지급되었는지
-          배분(allocation)과 지급(disbursement) 정보를 함께 조회합니다.
-        </p>
       </div>
     </section>
 
@@ -519,83 +577,180 @@
       <h2>6. Operator API</h2>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-post">POST</span>
             <span class="endpoint-title">캠페인 생성</span>
             <span class="endpoint-path">/operator/campaigns</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            새로운 후원 캠페인을 등록합니다. 생성자는 자동으로 createdBy에 기록됩니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+body:
+  title: "소아암 환아 치료비 지원"
+  description: "소아암 환아를 위한 치료비 지원 캠페인입니다."
+  startDate: "2025-01-01"
+  endDate: "2025-12-31"
+  status: "ACTIVE"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 201
+body:
+  campaignId: 101
+  title: "소아암 환아 치료비 지원"
+  description: "소아암 환아를 위한 치료비 지원 캠페인입니다."
+  startDate: "2025-01-01"
+  endDate: "2025-12-31"
+  status: "ACTIVE"
+  createdBy: 10</pre>
         </div>
-        <p class="endpoint-desc">
-          새로운 후원 캠페인을 등록합니다. 생성자는 자동으로 <code>created_by</code>에 기록됩니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">미검증 기부 조회</span>
             <span class="endpoint-path">/operator/donations</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            오늘 들어온 미검증 기부 건을 중심으로, 캠페인별·금액순으로 필터링하여 조회합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  verified: false
+  date: "2025-05-10"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - donationId: 6001
+      campaignId: 101
+      donorUsername: "donor02"
+      amount: 50000
+      donatedAt: "2025-05-10T10:00:00Z"
+      verified: false</pre>
         </div>
-        <p class="endpoint-desc">
-          오늘 들어온 미검증 기부 건을 중심으로, 캠페인별/금액순으로 필터링하여 조회합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-patch">PATCH</span>
             <span class="endpoint-title">기부 검증 상태 변경</span>
             <span class="endpoint-path">/operator/donations/{donationId}/verify</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            결제 모듈에서 생성된 기부 건의 verified 상태를 변경합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+path:
+  donationId: 6001
+body:
+  verified: true</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  donationId: 6001
+  campaignId: 101
+  amount: 50000
+  verified: true</pre>
         </div>
-        <p class="endpoint-desc">
-          결제 모듈에서 생성된 기부 건의 <code>verified</code> 상태를 변경합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">배분안 목록 조회</span>
             <span class="endpoint-path">/operator/allocations</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            자동 또는 수동으로 생성된 배분안을 조회하고, 상태별로 필터링합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  status: "PENDING"
+  campaignId: 101</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - allocationId: 9001
+      donationId: 5001
+      receiverId: 201
+      receiverName: "김아름"
+      amount: 20000
+      status: "PENDING"</pre>
         </div>
-        <p class="endpoint-desc">
-          자동 혹은 수동으로 생성된 배분안을 조회하고, 상태별로 필터링합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-put">PUT</span>
             <span class="endpoint-title">배분안 수정 및 승인</span>
             <span class="endpoint-path">/operator/allocations/{allocationId}</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Operator</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            배분 금액과 수혜자를 조정하고, PENDING 상태의 배분안을 APPROVED 또는 REJECTED로 변경합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+path:
+  allocationId: 9001
+body:
+  receiverId: 201
+  amount: 20000
+  status: "APPROVED"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  allocationId: 9001
+  donationId: 5001
+  receiverId: 201
+  amount: 20000
+  status: "APPROVED"</pre>
         </div>
-        <p class="endpoint-desc">
-          배분 금액과 수혜자를 조정하고, PENDING 상태의 배분안을 APPROVED 또는 REJECTED로 변경합니다.
-        </p>
       </div>
     </section>
 
@@ -603,52 +758,108 @@
       <h2>7. Accountant API</h2>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">지급 대상 배분 조회</span>
             <span class="endpoint-path">/accounting/allocations</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Accountant</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            승인된 배분안 목록을 조회하여 실제 지급 작업을 준비합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  status: "APPROVED"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - allocationId: 9001
+      donationId: 5001
+      receiverId: 201
+      amount: 20000
+      status: "APPROVED"</pre>
         </div>
-        <p class="endpoint-desc">
-          승인(APPROVED)된 배분안 목록을 조회하여 실제 지급 작업을 준비합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-post">POST</span>
             <span class="endpoint-title">지급 기록 생성</span>
             <span class="endpoint-path">/accounting/disbursements</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Accountant</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            지정된 배분에 대해 지급을 기록하고, 같은 트랜잭션 안에서 배분 상태를 EXECUTED로 변경합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+body:
+  allocationId: 9001
+  amount: 20000
+  paymentTxRef: "PG20250520001"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 201
+body:
+  disbursementId: 7001
+  allocationId: 9001
+  amount: 20000
+  executedAt: "2025-05-20T09:00:00Z"
+  paymentTxRef: "PG20250520001"
+  allocationStatus: "EXECUTED"</pre>
         </div>
-        <p class="endpoint-desc">
-          지정된 배분에 대해 지급(disbursement)을 기록하고, 같은 트랜잭션 안에서
-          배분 상태를 EXECUTED로 변경합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-post">POST</span>
             <span class="endpoint-title">지급 증빙 업로드</span>
             <span class="endpoint-path">/accounting/disbursements/{disbursementId}/documents</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Accountant</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            지급 건에 대한 영수증, 증빙 문서 파일을 업로드하고 파일 경로 및 해시를 저장합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+path:
+  disbursementId: 7001
+body:
+  fileName: "receipt-7001.pdf"
+  storagePath: "s3://bucket/receipt-7001.pdf"
+  fileHash: "b1946ac92492d2347c6235b4d2611184"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 201
+body:
+  documentId: 8001
+  disbursementId: 7001
+  fileName: "receipt-7001.pdf"
+  storagePath: "s3://bucket/receipt-7001.pdf"
+  fileHash: "b1946ac92492d2347c6235b4d2611184"
+  uploadedAt: "2025-05-20T09:05:00Z"</pre>
         </div>
-        <p class="endpoint-desc">
-          지급 건에 대한 영수증, 증빙 문서 파일을 업로드하고 파일 경로 및 해시를 저장합니다.
-        </p>
       </div>
     </section>
 
@@ -656,54 +867,127 @@
       <h2>8. Auditor API</h2>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">감사 로그 조회</span>
             <span class="endpoint-path">/audits/logs</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Auditor</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            사용자, 테이블, 액션별로 필터링 가능한 감사 로그를 조회합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  from: "2025-05-01"
+  to: "2025-05-31"
+  actorUserId: 10
+  objectTable: "allocation"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - auditId: 10001
+      occurredAt: "2025-05-10T09:00:00Z"
+      actorUserId: 10
+      action: "UPDATE"
+      objectTable: "allocation"
+      objectId: "9001"
+      detail: "status: PENDING -&gt; APPROVED"</pre>
         </div>
-        <p class="endpoint-desc">
-          사용자, 테이블, 액션별로 필터링 가능한 감사 로그를 조회합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">배분·지급 불일치 목록</span>
             <span class="endpoint-path">/audits/disbursement-mismatches</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Auditor</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            배분 금액과 실제 지급 금액이 일치하지 않는 건을 조회하여 추가 점검이 필요하도록 합니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  campaignId: 101</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - allocationId: 9100
+      expectedAmount: 30000
+      totalDisbursed: 25000
+      diff: 5000
+      status: "PARTIAL"</pre>
         </div>
-        <p class="endpoint-desc">
-          배분 금액과 실제 지급 금액이 일치하지 않는 건을 조회하여 추가 점검이 필요하도록 합니다.
-        </p>
       </div>
 
       <div class="endpoint">
-        <div class="endpoint-header">
-          <div>
+        <button class="endpoint-header endpoint-toggle" type="button">
+          <div class="endpoint-header-left">
             <span class="badge badge-get">GET</span>
             <span class="endpoint-title">문서 해시 목록 조회</span>
             <span class="endpoint-path">/audits/document-hashes</span>
           </div>
-          <div>
+          <div class="endpoint-header-right">
             <span class="badge-role">Auditor</span>
+            <span class="endpoint-arrow">▶</span>
           </div>
+        </button>
+        <div class="endpoint-body">
+          <p class="endpoint-desc">
+            지급 증빙 문서의 해시 목록을 조회하여 외부 시스템이나 블록체인에 저장된 값과 대조할 수 있습니다.
+          </p>
+          <div class="yaml-title">요청 예시 (YAML)</div>
+          <pre>headers:
+  Authorization: "Bearer &lt;access-token&gt;"
+query:
+  from: "2025-05-01"
+  to: "2025-05-31"</pre>
+          <div class="yaml-title">응답 예시 (YAML)</div>
+          <pre>status: 200
+body:
+  items:
+    - documentId: 8001
+      disbursementId: 7001
+      fileHash: "b1946ac92492d2347c6235b4d2611184"
+      uploadedAt: "2025-05-20T09:05:00Z"</pre>
         </div>
-        <p class="endpoint-desc">
-          지급 증빙 문서의 해시 목록을 조회하여 외부 시스템이나 블록체인에 저장된 값과 대조할 수 있습니다.
-        </p>
       </div>
     </section>
   </main>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var endpoints = document.querySelectorAll(".endpoint");
+    endpoints.forEach(function (endpoint) {
+      var header = endpoint.querySelector(".endpoint-toggle");
+      header.addEventListener("click", function () {
+        var isOpen = endpoint.classList.contains("open");
+        if (isOpen) {
+          endpoint.classList.remove("open");
+        } else {
+          endpoint.classList.add("open");
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>
