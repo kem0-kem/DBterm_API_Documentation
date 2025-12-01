@@ -1,180 +1,709 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <title>DBterm API Documentation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 0; background: #f5f5f7; color: #111; }
-    header { background: #111827; color: #f9fafb; padding: 24px 32px; }
-    header h1 { margin: 0; font-size: 24px; }
-    header p { margin: 4px 0 0; font-size: 14px; opacity: .8; }
-    .container { max-width: 1080px; margin: 32px auto; padding: 0 16px 32px; }
-    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; background: #e5e7eb; color: #374151; }
-    h2 { margin-top: 32px; font-size: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
-    h3 { margin-top: 24px; font-size: 16px; }
-    .endpoint { margin-top: 16px; padding: 16px 20px; border-radius: 12px; background: #ffffff; border: 1px solid #e5e7eb; }
-    .method { font-weight: 600; padding: 2px 8px; border-radius: 999px; font-size: 11px; margin-right: 8px; }
-    .method-get { background: #dbebff; color: #1d4ed8; }
-    .method-post { background: #dcfce7; color: #15803d; }
-    .method-put { background: #fef9c3; color: #92400e; }
-    .method-delete { background: #fee2e2; color: #b91c1c; }
-    .path { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 13px; }
-    .desc { margin-top: 8px; font-size: 13px; color: #4b5563; }
-    .section-body { font-size: 14px; color: #4b5563; line-height: 1.6; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-    th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; }
-    th { background: #f9fafb; font-weight: 600; }
-    code { background: #f3f4f6; padding: 2px 4px; border-radius: 4px; font-size: 12px; }
-    pre { background: #111827; color: #e5e7eb; padding: 12px 14px; border-radius: 8px; font-size: 12px; overflow-x: auto; }
-    pre code { background: transparent; padding: 0; }
-    footer { font-size: 12px; color: #9ca3af; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 16px; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f5f5f7;
+      color: #111827;
+    }
+    header {
+      background-color: #111827;
+      color: #f9fafb;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    header span {
+      font-size: 12px;
+      opacity: 0.75;
+    }
+    .container {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+    nav {
+      width: 260px;
+      background-color: #111827;
+      color: #e5e7eb;
+      padding: 16px 12px 32px 16px;
+      box-sizing: border-box;
+      position: sticky;
+      top: 60px;
+      align-self: flex-start;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+    nav h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 16px 0 8px;
+      color: #9ca3af;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    nav li {
+      margin-bottom: 4px;
+    }
+    nav a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #e5e7eb;
+      font-size: 13px;
+    }
+    nav a:hover {
+      background-color: #374151;
+    }
+    main {
+      flex: 1;
+      padding: 24px 32px 40px;
+      box-sizing: border-box;
+    }
+    main h2 {
+      margin-top: 32px;
+      margin-bottom: 8px;
+      font-size: 22px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 4px;
+    }
+    main h3 {
+      margin-top: 24px;
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+    main p {
+      margin-top: 4px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-right: 4px;
+    }
+    .badge-get { background-color: #dbf4ff; color: #0369a1; }
+    .badge-post { background-color: #dcfce7; color: #166534; }
+    .badge-put { background-color: #fef9c3; color: #854d0e; }
+    .badge-patch { background-color: #f3e8ff; color: #6b21a8; }
+    .badge-delete { background-color: #fee2e2; color: #b91c1c; }
+    .badge-role {
+      background-color: #e5e7eb;
+      color: #111827;
+      margin-left: 4px;
+    }
+    .endpoint {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 14px 16px 12px;
+      margin-top: 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      border: 1px solid #e5e7eb;
+    }
+    .endpoint-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .endpoint-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .endpoint-path {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background-color: #f3f4f6;
+      padding: 4px 6px;
+      border-radius: 6px;
+      margin-left: 4px;
+    }
+    .endpoint-desc {
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f9fafb;
+      font-weight: 500;
+    }
+    code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background-color: #f3f4f6;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    pre {
+      background-color: #020617;
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+      font-size: 11px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 960px) {
+      .container {
+        flex-direction: column;
+      }
+      nav {
+        position: static;
+        width: 100%;
+        max-height: none;
+      }
+      main {
+        padding: 16px 16px 32px;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
+<header>
+  <div>
     <h1>DBterm API</h1>
-    <p>Minimal API documentation filled with lorem ipsum placeholder text.</p>
-  </header>
+    <span>Transparent Donation Management System · v1</span>
+  </div>
+  <div>
+    <span>Base URL: <code>https://api.example.com</code></span>
+  </div>
+</header>
 
-  <main class="container">
-    <div class="tag">v1 · Draft</div>
+<div class="container">
+  <nav>
     <h2>Overview</h2>
-    <div class="section-body">
+    <ul>
+      <li><a href="#overview">소개</a></li>
+      <li><a href="#auth">인증</a></li>
+      <li><a href="#roles">역할 및 권한</a></li>
+    </ul>
+
+    <h2>API</h2>
+    <ul>
+      <li><a href="#auth-api">Auth</a></li>
+      <li><a href="#donor-api">Donor</a></li>
+      <li><a href="#operator-api">Operator</a></li>
+      <li><a href="#accounting-api">Accountant</a></li>
+      <li><a href="#auditor-api">Auditor</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <h2>1. 시스템 소개</h2>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer euismod,
-        lorem quis tincidunt pretium, lorem ipsum facilisis mi, sed fermentum
-        mauris risus eget velit. Pellentesque habitant morbi tristique senectus
-        et netus et malesuada fames ac turpis egestas.
+        DBterm API는 후원금의 수집부터 집행까지 전 과정을 데이터베이스에 기록하고,
+        역할별로 검증 가능한 형태로 조회할 수 있게 하는 백엔드 API입니다.
       </p>
       <p>
-        Vivamus in lectus a ipsum ultricies tempus. Sed eu pharetra ex.
-        Suspendisse vestibulum, elit vitae convallis pharetra, urna neque
-        malesuada nisl, ut bibendum ipsum risus vitae justo.
+        후원자는 자신의 후원 내역과 실제 집행 정보를 추적할 수 있고,
+        운영자와 회계 담당자는 캠페인과 배분·지급 절차를 관리하며,
+        감사는 로그와 불일치 내역을 점검하여 투명성을 보장합니다.
       </p>
-    </div>
+    </section>
 
-    <h2>Authentication</h2>
-    <div class="section-body">
+    <section id="auth">
+      <h2>2. 인증 방식</h2>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean lacinia
-        vestibulum lorem, sed convallis velit gravida sed. Cras a imperdiet neque.
+        모든 보호된 API는 인증 토큰 기반으로 호출합니다.
+        로그인 성공 시 발급되는 액세스 토큰을 이후 요청의 <code>Authorization</code> 헤더에 포함해야 합니다.
       </p>
-      <p>
-        All requests must include a header of the form <code>Authorization: Bearer &lt;token&gt;</code>.
-        Vestibulum ac bibendum nunc, ut efficitur lorem.
-      </p>
-    </div>
+      <pre>{
+  "Authorization": "Bearer &lt;access-token&gt;"
+}</pre>
+    </section>
 
-    <h2>Endpoints</h2>
-
-    <h3>Users</h3>
-
-    <div class="endpoint">
+    <section id="roles">
+      <h2>3. 역할 및 권한</h2>
+      <p>시스템에는 다음과 같은 주요 역할이 존재합니다.</p>
       <div>
-        <span class="method method-get">GET</span>
-        <span class="path">/api/v1/users</span>
+        <span class="tag">Admin</span>
+        <span class="tag">Donor</span>
+        <span class="tag">Operator</span>
+        <span class="tag">Accountant</span>
+        <span class="tag">Auditor</span>
       </div>
-      <p class="desc">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut
-        sollicitudin mi, et tincidunt arcu. Cras ut purus nulla.
-      </p>
       <table>
         <thead>
           <tr>
-            <th>Query</th>
-            <th>Type</th>
-            <th>Description</th>
+            <th>역할</th>
+            <th>주요 권한</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><code>page</code></td>
-            <td>integer</td>
-            <td>Lorem ipsum dolor sit amet.</td>
+            <td>Admin</td>
+            <td>사용자 계정 전체 관리, 역할 부여 및 변경</td>
           </tr>
           <tr>
-            <td><code>size</code></td>
-            <td>integer</td>
-            <td>Consectetur adipiscing elit sed do.</td>
+            <td>Donor</td>
+            <td>본인 후원 내역 조회, 후원금 사용처 추적</td>
+          </tr>
+          <tr>
+            <td>Operator</td>
+            <td>캠페인 생성·수정, 기부 건 검증, 배분안 검토 및 승인</td>
+          </tr>
+          <tr>
+            <td>Accountant</td>
+            <td>승인된 배분에 대한 지급 처리, 수혜자 정보 관리, 증빙 업로드</td>
+          </tr>
+          <tr>
+            <td>Auditor</td>
+            <td>감사 로그 조회, 배분·지급 불일치 탐지, 문서 해시 검증</td>
           </tr>
         </tbody>
       </table>
-    </div>
+    </section>
 
-    <div class="endpoint">
-      <div>
-        <span class="method method-post">POST</span>
-        <span class="path">/api/v1/users</span>
+    <section id="auth-api">
+      <h2>4. Auth API</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-post">POST</span>
+            <span class="endpoint-title">로그인</span>
+            <span class="endpoint-path">/auth/login</span>
+          </div>
+          <div>
+            <span class="badge-role">Public</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          아이디와 비밀번호를 이용해 로그인하고 액세스 토큰을 발급받습니다.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Request Body</th>
+              <th>타입</th>
+              <th>필수</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>username</td>
+              <td>string</td>
+              <td>Y</td>
+              <td>사용자 로그인 ID</td>
+            </tr>
+            <tr>
+              <td>password</td>
+              <td>string</td>
+              <td>Y</td>
+              <td>비밀번호(평문 또는 별도 암호화 규약에 따름)</td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Response</th>
+              <th>타입</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>accessToken</td>
+              <td>string</td>
+              <td>API 호출에 사용하는 JWT 또는 토큰 값</td>
+            </tr>
+            <tr>
+              <td>user</td>
+              <td>object</td>
+              <td><code>userId, username, role</code> 등 기본 정보</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <p class="desc">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tempus
-        convallis orci, sed hendrerit lacus suscipit in.
-      </p>
-      <p class="desc"><strong>Request body</strong></p>
-      <pre><code>{
-  "username": "lorem",
-  "email": "ipsum@example.com",
-  "password": "dolor-sit-amet"
-}</code></pre>
-    </div>
 
-    <h3>Sessions</h3>
-
-    <div class="endpoint">
-      <div>
-        <span class="method method-post">POST</span>
-        <span class="path">/api/v1/sessions</span>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">내 정보 조회</span>
+            <span class="endpoint-path">/auth/me</span>
+          </div>
+          <div>
+            <span class="badge-role">Authenticated</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          현재 로그인한 사용자의 기본 정보를 반환합니다.
+        </p>
       </div>
-      <p class="desc">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lacinia
-        ligula venenatis, feugiat ipsum ac, faucibus sem.
-      </p>
-      <p class="desc"><strong>Sample response</strong></p>
-      <pre><code>{
-  "accessToken": "lorem.ipsum.dolor",
-  "tokenType": "Bearer",
-  "expiresIn": 3600
-}</code></pre>
-    </div>
 
-    <h2>Error Handling</h2>
-    <div class="section-body">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere
-        diam mauris, a lacinia orci facilisis vel. Donec et dapibus tortor.
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Code</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>400</td>
-            <td><code>BAD_REQUEST</code></td>
-            <td>Lorem ipsum dolor sit amet.</td>
-          </tr>
-          <tr>
-            <td>401</td>
-            <td><code>UNAUTHORIZED</code></td>
-            <td>Consectetur adipiscing elit sed do.</td>
-          </tr>
-          <tr>
-            <td>500</td>
-            <td><code>INTERNAL_ERROR</code></td>
-            <td>Integer euismod lorem quis tincidunt.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-put">PUT</span>
+            <span class="endpoint-title">내 프로필 수정</span>
+            <span class="endpoint-path">/auth/me/profile</span>
+          </div>
+          <div>
+            <span class="badge-role">Authenticated</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          표시 이름, 익명 여부 등 일부 프로필 정보를 수정합니다.
+          모든 변경 내역은 감사 로그에 기록됩니다.
+        </p>
+      </div>
+    </section>
 
-    <footer>
-      DBterm API Documentation · Lorem ipsum placeholder draft
-    </footer>
+    <section id="donor-api">
+      <h2>5. Donor API</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">캠페인 목록 조회</span>
+            <span class="endpoint-path">/campaigns</span>
+          </div>
+          <div>
+            <span class="badge-role">Donor</span>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          활성화된 후원 캠페인 목록을 조회합니다. Donor는 읽기 전용입니다.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Query</th>
+              <th>타입</th>
+              <th>필수</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>status</td>
+              <td>string</td>
+              <td>N</td>
+              <td>ACTIVE, INACTIVE 필터</td>
+            </tr>
+            <tr>
+              <td>from</td>
+              <td>date</td>
+              <td>N</td>
+              <td>시작일 기준 필터(예: 2025-01-01)</td>
+            </tr>
+            <tr>
+              <td>to</td>
+              <td>date</td>
+              <td>N</td>
+              <td>종료일 기준 필터</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">내 후원 내역 조회</span>
+            <span class="endpoint-path">/donor/donations</span>
+          </div>
+          <div>
+            <span class="badge-role">Donor</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          로그인한 후원자의 기부 내역을 기간 및 캠페인별로 조회합니다.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Query</th>
+              <th>타입</th>
+              <th>필수</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>from</td>
+              <td>date</td>
+              <td>N</td>
+              <td>조회 시작일</td>
+            </tr>
+            <tr>
+              <td>to</td>
+              <td>date</td>
+              <td>N</td>
+              <td>조회 종료일</td>
+            </tr>
+            <tr>
+              <td>campaignId</td>
+              <td>number</td>
+              <td>N</td>
+              <td>특정 캠페인만 필터링</td>
+            </tr>
+            <tr>
+              <td>sort</td>
+              <td>string</td>
+              <td>N</td>
+              <td>DATE_ASC, DATE_DESC, AMOUNT_DESC 등</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">후원금 사용처 추적</span>
+            <span class="endpoint-path">/donor/donations/{donationId}/trace</span>
+          </div>
+          <div>
+            <span class="badge-role">Donor</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          선택한 후원 건이 어떤 수혜자에게 얼마씩 배분되고, 실제로 언제 지급되었는지
+          배분(allocation)과 지급(disbursement) 정보를 함께 조회합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="operator-api">
+      <h2>6. Operator API</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-post">POST</span>
+            <span class="endpoint-title">캠페인 생성</span>
+            <span class="endpoint-path">/operator/campaigns</span>
+          </div>
+          <div>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          새로운 후원 캠페인을 등록합니다. 생성자는 자동으로 <code>created_by</code>에 기록됩니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">미검증 기부 조회</span>
+            <span class="endpoint-path">/operator/donations</span>
+          </div>
+          <div>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          오늘 들어온 미검증 기부 건을 중심으로, 캠페인별/금액순으로 필터링하여 조회합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-patch">PATCH</span>
+            <span class="endpoint-title">기부 검증 상태 변경</span>
+            <span class="endpoint-path">/operator/donations/{donationId}/verify</span>
+          </div>
+          <div>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          결제 모듈에서 생성된 기부 건의 <code>verified</code> 상태를 변경합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">배분안 목록 조회</span>
+            <span class="endpoint-path">/operator/allocations</span>
+          </div>
+          <div>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          자동 혹은 수동으로 생성된 배분안을 조회하고, 상태별로 필터링합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-put">PUT</span>
+            <span class="endpoint-title">배분안 수정 및 승인</span>
+            <span class="endpoint-path">/operator/allocations/{allocationId}</span>
+          </div>
+          <div>
+            <span class="badge-role">Operator</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          배분 금액과 수혜자를 조정하고, PENDING 상태의 배분안을 APPROVED 또는 REJECTED로 변경합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="accounting-api">
+      <h2>7. Accountant API</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">지급 대상 배분 조회</span>
+            <span class="endpoint-path">/accounting/allocations</span>
+          </div>
+          <div>
+            <span class="badge-role">Accountant</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          승인(APPROVED)된 배분안 목록을 조회하여 실제 지급 작업을 준비합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-post">POST</span>
+            <span class="endpoint-title">지급 기록 생성</span>
+            <span class="endpoint-path">/accounting/disbursements</span>
+          </div>
+          <div>
+            <span class="badge-role">Accountant</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          지정된 배분에 대해 지급(disbursement)을 기록하고, 같은 트랜잭션 안에서
+          배분 상태를 EXECUTED로 변경합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-post">POST</span>
+            <span class="endpoint-title">지급 증빙 업로드</span>
+            <span class="endpoint-path">/accounting/disbursements/{disbursementId}/documents</span>
+          </div>
+          <div>
+            <span class="badge-role">Accountant</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          지급 건에 대한 영수증, 증빙 문서 파일을 업로드하고 파일 경로 및 해시를 저장합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="auditor-api">
+      <h2>8. Auditor API</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">감사 로그 조회</span>
+            <span class="endpoint-path">/audits/logs</span>
+          </div>
+          <div>
+            <span class="badge-role">Auditor</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          사용자, 테이블, 액션별로 필터링 가능한 감사 로그를 조회합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">배분·지급 불일치 목록</span>
+            <span class="endpoint-path">/audits/disbursement-mismatches</span>
+          </div>
+          <div>
+            <span class="badge-role">Auditor</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          배분 금액과 실제 지급 금액이 일치하지 않는 건을 조회하여 추가 점검이 필요하도록 합니다.
+        </p>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <div>
+            <span class="badge badge-get">GET</span>
+            <span class="endpoint-title">문서 해시 목록 조회</span>
+            <span class="endpoint-path">/audits/document-hashes</span>
+          </div>
+          <div>
+            <span class="badge-role">Auditor</span>
+          </div>
+        </div>
+        <p class="endpoint-desc">
+          지급 증빙 문서의 해시 목록을 조회하여 외부 시스템이나 블록체인에 저장된 값과 대조할 수 있습니다.
+        </p>
+      </div>
+    </section>
   </main>
+</div>
 </body>
 </html>
